@@ -83,6 +83,18 @@ echo "=========="
 echo
 ${trekker}
 
+echo "=========="
+echo "===Test 1.1: Test trekker --info"
+echo "=========="
+echo
+${trekker} --info
+
+echo "=========="
+echo "===Test 1.2: Test trekker --help"
+echo "=========="
+echo
+${trekker} --help
+
 echo
 echo
 echo "=========="
