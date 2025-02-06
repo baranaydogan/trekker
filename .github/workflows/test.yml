@@ -104,7 +104,7 @@ jobs:
         artifact_id=$(gh api \
           -H "Accept: application/vnd.github+json" \
           /repos/{owner}/{repo}/actions/runs/$run_id/artifacts \
-          --jq '.artifacts[] | select(.name == "macOS-arm64") | .id')
+          --jq '.artifacts[] | select(.name == "macOS-arm64_binary") | .id')
 
         # 3. Set outputs for use in later steps
         echo "run_id=$run_id" >> $GITHUB_OUTPUT
