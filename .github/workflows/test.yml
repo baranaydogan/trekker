@@ -104,7 +104,7 @@ jobs:
         artifact_id=$(gh api \
           -H "Accept: application/vnd.github+json" \
           /repos/{owner}/{repo}/actions/runs/$run_id/artifacts \
-          --jq '.artifacts[] | select(.name == "macOS-universal_binary") | .id')
+          --jq '.artifacts[] | select(.name == "macOS-arm64") | .id')
 
         # 3. Set outputs for use in later steps
         echo "run_id=$run_id" >> $GITHUB_OUTPUT
@@ -118,7 +118,7 @@ jobs:
         script: |
           const fs = require('fs').promises;
           const artifactId = ${{ steps.get_artifact.outputs.artifact_id }};
-          const artifactName = 'macOS-universal_binary';
+          const artifactName = 'macOS-arm64';
           const download = await github.rest.actions.downloadArtifact({
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -133,7 +133,7 @@ jobs:
       shell: bash
       working-directory: ./tests/testScripts
       run: |
-        if file macOS-universal_binary.zip | grep -q "Zip archive"; then
+        if file macOS-arm64.zip | grep -q "Zip archive"; then
           echo "artifact_type=zip" >> $GITHUB_OUTPUT
         else
           echo "artifact_type=file" >> $GITHUB_OUTPUT
@@ -143,7 +143,7 @@ jobs:
       if: steps.check_artifact.outputs.artifact_type == 'zip'
       shell: bash
       working-directory: ./tests/testScripts
-      run: unzip macOS-universal_binary.zip -d .
+      run: unzip macOS-arm64.zip -d .
 
     - name: Run test script
       shell: bash

@@ -19,7 +19,7 @@ export OpenMP_omp_LIBRARY="${libomp_prefix}/lib/libomp.dylib"
 
 
 # Make sure trekker_linux is executable
-trekker=./trekker_macOS
+trekker=./trekker_macOS_arm64
 
 chmod +x ${trekker}
 
