@@ -1,9 +1,9 @@
-name: Test
+name: Test_macOS
 
 on:
   push:
     branches:
-      - test
+      - test_macOS
 
 jobs:
   # test_linux:
