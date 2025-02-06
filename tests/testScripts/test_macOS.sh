@@ -103,6 +103,12 @@ echo "=========="
 echo
 ${trekker} info
 
+echo "=========="
+echo "===Test 2.1: Test trekker --help"
+echo "=========="
+echo
+${trekker} info --help
+
 
 echo
 echo
@@ -111,6 +117,14 @@ echo "===Test 3: Display dMRI recon help"
 echo "=========="
 echo
 ${trekker} dMRI recon
+
+echo
+echo
+echo "=========="
+echo "===Test 3.1: Display dMRI recon help"
+echo "=========="
+echo
+${trekker} dMRI recon --help
 
 
 echo
