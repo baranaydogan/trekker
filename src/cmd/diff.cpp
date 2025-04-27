@@ -36,25 +36,25 @@ void run_diff()
 
 
     NIBR::disp(MSG_DEBUG,"Initializing input reader");
-    NIBR::TractogramReader inp_tractogram;
-    if (!inp_tractogram.initReader(inp_fname)) {
-        std::cout << "Can't read " << inp_fname << std::endl << std::flush;
+    auto inp_tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!inp_tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
         return;
     }
 
     NIBR::disp(MSG_DEBUG,"Initializing reference reader");
-    NIBR::TractogramReader ref_tractogram;
-    if (!ref_tractogram.initReader(ref_fname)) {
-        std::cout << "Can't read " << ref_fname << std::endl << std::flush;
+    auto ref_tractogram = std::make_shared<NIBR::TractogramReader>(ref_fname);
+    if(!ref_tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read reference tractogram file!");
         return;
     }
 
     NIBR::disp(MSG_DEBUG,"Running diff");
-    auto diff = NIBR::tractogramDiff(&inp_tractogram,&ref_tractogram);
+    auto diff = NIBR::tractogramDiff(inp_tractogram,ref_tractogram);
 
     NIBR::disp(MSG_DEBUG,"Writing tractogram");
-    if (out_diff_fname!="") NIBR::writeTractogram(out_diff_fname, &inp_tractogram, std::get<0>(diff));
-    if (out_same_fname!="") NIBR::writeTractogram(out_same_fname, &inp_tractogram, std::get<1>(diff));
+    if (out_diff_fname!="") NIBR::writeTractogram(out_diff_fname, inp_tractogram, std::get<0>(diff));
+    if (out_same_fname!="") NIBR::writeTractogram(out_same_fname, inp_tractogram, std::get<1>(diff));
 
 }
 

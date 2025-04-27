@@ -19,9 +19,9 @@ void run_fieldRemove()
 
     if(!ensureVTK(inp_tractogram))      return;
 
-    NIBR::TractogramReader tractogram;
-    if(!tractogram.initReader(inp_tractogram)){
-        std::cout << "Could not read the file!"<<std::endl;
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_tractogram);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
         return;
     }
 
@@ -45,7 +45,7 @@ void run_fieldRemove()
     clearField(fields[fieldId],tractogram);
     fields.erase(fields.begin()+fieldId);
     
-    auto tmp = tractogram.read();
+    auto tmp = tractogram->read();
 
     writeTractogram(inp_tractogram,tmp,fields);
     

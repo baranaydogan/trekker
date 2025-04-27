@@ -32,8 +32,12 @@ void run_track2surf()
     
     // Initialize tractogram
     if(!ensureVTKorTCK(inp_fname)) return;
-    NIBR::TractogramReader* tractogram = new NIBR::TractogramReader();
-    tractogram->initReader(inp_fname);
+    NIBR::disp(MSG_DEBUG,"Initializing tractogram");
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
     
     if (tractogram->numberOfStreamlines<1) {
         std::cout << "Empty tractogram" << std::endl;
@@ -79,7 +83,6 @@ void run_track2surf()
     // Create tractogram to surface map
     std::vector<std::vector<streamline2faceMap>> mapping;    
     tractogram2surfaceMapper(tractogram, surf, mapping, true);
-    delete tractogram;
 
     // Prepare and write selected feature on surface
 

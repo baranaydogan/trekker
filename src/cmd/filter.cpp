@@ -49,9 +49,13 @@ void run_filter()
     if(!ensureVTKorTCK(out_fname)) return; 
 
     // Initialize tractogram
-    NIBR::TractogramReader tractogram(inp_fname);
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
 
-    if (tractogram.numberOfStreamlines < 1) {
+    if (tractogram->numberOfStreamlines < 1) {
         std::vector<std::vector<std::vector<float>>> track;
         disp(MSG_ERROR,"Empty tractogram file.");
          
@@ -104,7 +108,7 @@ void run_filter()
  
     pw.print();
 
-    auto filtOut = pathFilter(&tractogram, &pw, numberOfThreads, maxOut);
+    auto filtOut = pathFilter(tractogram, &pw, numberOfThreads, maxOut);
 
     std::vector<size_t> idx     = std::get<0>(filtOut);
     std::vector<float>  begIdx  = std::get<1>(filtOut);
@@ -132,8 +136,12 @@ void run_filter()
         disp(MSG_INFO, "Writing selected streamlines.");
 
         if (ascii && (out_ext=="vtk")) {
-            NIBR::TractogramReader inp_tractogram(inp_fname);
-            NIBR::writeTractogram_VTK_ascii(out_fname, &inp_tractogram, idx);
+            auto inp_tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+            if(!inp_tractogram->isOpen()){
+                disp(MSG_ERROR,"Could not read input tractogram file!");
+                return;
+            }
+            NIBR::writeTractogram_VTK_ascii(out_fname, inp_tractogram, idx);
         }
         else {
             NIBR::writeTractogram(out_fname, inp_fname, idx);
@@ -150,7 +158,7 @@ void run_filter()
         for (size_t i = 0; i < idx.size(); i++)
         {     
             
-            std::vector<Point> st = tractogram.readStreamlinePoints(idx[i]);
+            std::vector<Point> st = tractogram->readStreamlinePoints(idx[i]);
 
             // Reverse the begin and end indexes
             if(endIdx[i]<begIdx[i]) std::swap(begIdx[i],endIdx[i]);
@@ -204,8 +212,12 @@ void run_filter()
         disp(MSG_INFO, "Writing uncropped streamlines.");
 
         if (ascii && (getFileExtension(saveUncr)=="vtk")) {
-            NIBR::TractogramReader inp_tractogram(inp_fname);
-            NIBR::writeTractogram_VTK_ascii(saveUncr, &inp_tractogram, idx);
+            auto inp_tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+            if(!inp_tractogram->isOpen()){
+                disp(MSG_ERROR,"Could not read input tractogram file!");
+                return;
+            }
+            NIBR::writeTractogram_VTK_ascii(saveUncr, inp_tractogram, idx);
         } else {
             NIBR::writeTractogram(saveUncr, inp_fname, idx);
         }
@@ -215,17 +227,21 @@ void run_filter()
 
         disp(MSG_INFO, "Writing discarded streamlines.");
         
-        NIBR::TractogramReader inp_tractogram(inp_fname);
+        auto inp_tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+        if(!inp_tractogram->isOpen()){
+            disp(MSG_ERROR,"Could not read input tractogram file!");
+            return;
+        }
         std::vector<size_t> discIdx;
         
-        discIdx.reserve(inp_tractogram.numberOfStreamlines);
-        for (size_t n = 0; n < inp_tractogram.numberOfStreamlines; n++) {
+        discIdx.reserve(inp_tractogram->numberOfStreamlines);
+        for (size_t n = 0; n < inp_tractogram->numberOfStreamlines; n++) {
             discIdx.push_back(n);
         }
         NIBR::removeIdx(discIdx,idx);
 
         if (ascii && (getFileExtension(saveDisc)=="vtk")) {
-            NIBR::writeTractogram_VTK_ascii(saveDisc, &inp_tractogram, discIdx);
+            NIBR::writeTractogram_VTK_ascii(saveDisc, inp_tractogram, discIdx);
         } else {
             NIBR::writeTractogram(saveDisc, inp_fname, discIdx);
         }

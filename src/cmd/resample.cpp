@@ -39,15 +39,20 @@ void run_resample()
         return;
     }
     
-    NIBR::TractogramReader tractogram(inp_fname);
+
+    NIBR::disp(MSG_DEBUG,"Initializing tractogram");
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
 
     std::vector<std::vector<std::vector<float>>> out;
-
     
     if (*sizeOpt) {
-        out = NIBR::resampleTractogram_withStepSize(&tractogram,stepSize);
+        out = NIBR::resampleTractogram_withStepSize(tractogram,stepSize);
     } else {
-        out = NIBR::resampleTractogram_withStepCount(&tractogram,stepCount);
+        out = NIBR::resampleTractogram_withStepCount(tractogram,stepCount);
     }
     
 

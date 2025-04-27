@@ -86,9 +86,14 @@ void run_transform()
     }
 
 
-    NIBR::TractogramReader tractogram(inp_fname);
+    NIBR::disp(MSG_DEBUG,"Initializing tractogram");
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
 
-    auto out = NIBR::applyTransform(&tractogram,M);
+    auto out = NIBR::applyTransform(tractogram,M);
 
     NIBR::writeTractogram(out_fname, out);
 

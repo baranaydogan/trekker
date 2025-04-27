@@ -27,13 +27,13 @@ void run_fieldImport()
 
     if(!ensureVTK(inp_fname))      return;
 
-    NIBR::TractogramReader tractogram;
-    if(!tractogram.initReader(inp_fname)){
-        std::cout << "Could not read the file!"<<std::endl;
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
         return;
     }
 
-    disp(MSG_DEBUG,"Streamline count: %d, Point count: %d", tractogram.numberOfStreamlines,tractogram.numberOfPoints);
+    disp(MSG_DEBUG,"Streamline count: %d, Point count: %d", tractogram->numberOfStreamlines,tractogram->numberOfPoints);
 
     // Check if this field already exists
     int fieldId = -1;
@@ -46,7 +46,7 @@ void run_fieldImport()
     }
     
     if ((force==false) && (fieldId>-1)) {
-        std::cout << "A field with name \"" << inp_field_name << "\" already exists in the tractogram. Use --force or -f to overwrite." << std::endl;
+        std::cout << "A field with name \"" << inp_field_name << "\" already exists in the tractogram-> Use --force or -f to overwrite." << std::endl;
         return;
     }
 
@@ -69,7 +69,7 @@ void run_fieldImport()
 
     NIBR::disp(MSG_DETAIL,"Writing %d fields", fields.size());
     
-    auto tmp = tractogram.read();
+    auto tmp = tractogram->read();
 
     writeTractogram(inp_fname,tmp,fields);
     

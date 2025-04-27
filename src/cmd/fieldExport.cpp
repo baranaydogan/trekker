@@ -22,9 +22,9 @@ void run_fieldExport()
 
     if(!ensureVTK(inp_fname))      return;
     
-    NIBR::TractogramReader tractogram;
-    if(!tractogram.initReader(inp_fname)){
-        std::cout << "Could not read the file!"<<std::endl;
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
         return;
     }
     
@@ -82,8 +82,8 @@ void run_fieldExport()
         }
         
         if (owner==POINT_OWNER){
-            for (size_t s=0; s<tractogram.numberOfStreamlines; s++) {
-                for (uint32_t l=0; l<tractogram.len[s]; l++) {
+            for (size_t s=0; s<tractogram->numberOfStreamlines; s++) {
+                for (uint32_t l=0; l<tractogram->len[s]; l++) {
                     for (std::vector<NIBR::TractogramField>::iterator it=fields.begin(); it!=fields.end(); it++) {
                         for (int d=0; d<it->dimension; d++) {
                             if (it->datatype==FLOAT32_DT) {sprintf(buffer, "%6.6f ",((float***)(it->data))[s][l][d]); fwrite(buffer, sizeof(char), strlen(buffer), out);}
@@ -96,7 +96,7 @@ void run_fieldExport()
         }
         
         if (owner==STREAMLINE_OWNER){
-            for (size_t i=0; i<tractogram.numberOfStreamlines; i++) {
+            for (size_t i=0; i<tractogram->numberOfStreamlines; i++) {
                 for (std::vector<NIBR::TractogramField>::iterator it=fields.begin(); it!=fields.end(); it++) {
                     for (int d=0; d<it->dimension; d++) {
                         if (it->datatype==FLOAT32_DT) {sprintf(buffer, "%6.6f ",((float**)(it->data))[i][d]); fwrite(buffer, sizeof(char), strlen(buffer), out);}

@@ -23,7 +23,11 @@ void run_addColor()
     if(!ensureVTK(inp_fname))      return;
     if(!ensureVTK(out_fname))      return;
 
-    NIBR::TractogramReader tractogram(inp_fname);
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
 
     int fieldId = -1;
     std::vector<NIBR::TractogramField> tmpFields = findTractogramFields(tractogram);
@@ -45,8 +49,8 @@ void run_addColor()
     }
 
     
-    auto colors         = NIBR::colorTractogram(&tractogram);
-    auto allStreamlines = tractogram.read();
+    auto colors         = NIBR::colorTractogram(tractogram);
+    auto allStreamlines = tractogram->read();
 
     fields.push_back(colors);
 

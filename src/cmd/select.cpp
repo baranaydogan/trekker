@@ -42,8 +42,14 @@ void run_select()
     if(!ensureVTKorTCK(inp_fname))      return;
     if(!ensureVTKorTCK(out_fname))      return;
     
-    NIBR::TractogramReader tractogram(inp_fname);
-    int N = tractogram.numberOfStreamlines;
+    NIBR::disp(MSG_DEBUG,"Initializing tractogram");
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
+    
+    int N = tractogram->numberOfStreamlines;
 
     std::vector<size_t> select;
 
@@ -65,7 +71,7 @@ void run_select()
         }
         fclose(selectFile);
 
-        writeTractogram(out_fname, &tractogram, select);
+        writeTractogram(out_fname, tractogram, select);
 
     } else if(*randomOpt){
 
@@ -82,7 +88,7 @@ void run_select()
         std::shuffle(std::begin(allInd), std::end(allInd), r.getGen());
         select.insert(select.begin(),allInd.begin(),allInd.begin()+_random);
 
-        NIBR::writeTractogram(out_fname, &tractogram, select);
+        NIBR::writeTractogram(out_fname, tractogram, select);
 
     } else {
 
@@ -110,7 +116,7 @@ void run_select()
         for (int i = _ordered[0]; i < (_ordered[1]+1); i++)
             select.push_back(i-1);
 
-        NIBR::writeTractogram(out_fname, &tractogram, select);
+        NIBR::writeTractogram(out_fname, tractogram, select);
         
     }
 

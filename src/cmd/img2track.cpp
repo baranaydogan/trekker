@@ -25,19 +25,19 @@ void run_map2track()
     
     // Initialize tractogram and make copies for multithreader
     if(!ensureVTKorTCK(inp_tractogram)) return;
-    NIBR::TractogramReader* tractogram = new NIBR::TractogramReader[numberOfThreads]();
-    tractogram[0].initReader(inp_tractogram);
 
-    int N = tractogram[0].numberOfStreamlines;
-
-    if (N<1) {
-        std::cout << "Empty tractogram" << std::endl;
-        delete[] tractogram;
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_tractogram);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
         return;
     }
 
-    for (int t = 1; t < numberOfThreads; t++)
-        tractogram[t].copyFrom(tractogram[0]);
+    int N = tractogram->numberOfStreamlines;
+
+    if (N<1) {
+        std::cout << "Empty tractogram" << std::endl;
+        return;
+    }
     
 
     // Output from SH image
@@ -53,8 +53,8 @@ void run_map2track()
 
         auto run = [&](NIBR::MT::TASK task)->void {
 
-            float** streamline = tractogram[task.threadId].readStreamline(task.no);
-            int len            = tractogram[task.threadId].len[task.no];
+            float** streamline = tractogram->readStreamline(task.no);
+            int len            = tractogram->len[task.no];
             mapping[task.no].reserve(len);
 
             float T[3];
@@ -72,10 +72,6 @@ void run_map2track()
 
         };
         NIBR::MT::MTRUN(N, "Mapping from spherical harmonic expansion", run);
-
-        for (int t = 0; t < numberOfThreads; t++) 
-            tractogram[t].destroyCopy();
-        delete[] tractogram;
         
         std::ofstream out;
         out.open(out_fname,std::ios::binary);
@@ -109,8 +105,8 @@ void run_map2track()
 
         auto run = [&](NIBR::MT::TASK task)->void {
 
-            float** streamline = tractogram[task.threadId].readStreamline(task.no);
-            int len            = tractogram[task.threadId].len[task.no];
+            float** streamline = tractogram->readStreamline(task.no);
+            int len            = tractogram->len[task.no];
             mapping[task.no].reserve(len);
 
             float T[3];
@@ -167,12 +163,6 @@ void run_map2track()
 
         };
         NIBR::MT::MTRUN(N, "Mapping from spherical function", run);
-        // NIBR::MT::MTRUN(N, run);
-
-    
-        for (int t = 0; t < numberOfThreads; t++) 
-            tractogram[t].destroyCopy();
-        delete[] tractogram;
 
         std::ofstream out;
         out.open(out_fname,std::ios::binary);
@@ -202,8 +192,8 @@ void run_map2track()
 
     auto run = [&](NIBR::MT::TASK task)->void {
 
-        float** streamline = tractogram[task.threadId].readStreamline(task.no);
-        int len            = tractogram[task.threadId].len[task.no];
+        float** streamline = tractogram->readStreamline(task.no);
+        int len            = tractogram->len[task.no];
         mapping[task.no].reserve(len);
         
         for (int l=0; l<len; l++) {
@@ -221,10 +211,6 @@ void run_map2track()
 
     };
     NIBR::MT::MTRUN(N, "Mapping values", run);
-
-    for (int t = 0; t < numberOfThreads; t++) 
-        tractogram[t].destroyCopy();
-    delete[] tractogram;
     
     std::ofstream out;
     out.open(out_fname,std::ios::binary);

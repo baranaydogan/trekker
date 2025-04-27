@@ -82,9 +82,13 @@ void run_track2img()
     }
 
     // Initialize tractogram
-    NIBR::TractogramReader tractogram(inp_fname);
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
 
-    if (tractogram.numberOfStreamlines<1) {
+    if (tractogram->numberOfStreamlines<1) {
         std::cout << "Empty tractogram" << std::endl;
         //return;
     }
@@ -149,7 +153,7 @@ void run_track2img()
 
         // Use voxDim
         if (voxDim.empty()==false) {
-            std::vector<float> bb = getTractogramBBox(&tractogram);
+            std::vector<float> bb = getTractogramBBox(tractogram);
             if (sfRes>0) {
                 bb.push_back(-0.5);
                 bb.push_back(int64_t(SF::getSFCoords().size())-0.5);
@@ -160,7 +164,7 @@ void run_track2img()
         }
 
     
-        Tractogram2ImageMapper<float> gridder(&tractogram,&img);
+        Tractogram2ImageMapper<float> gridder(tractogram,&img);
 
         if (*mask_option) {
             NIBR::Image<int> mask(mask_image);
@@ -255,7 +259,7 @@ void run_track2img()
 
         // Use voxDim
         if (voxDim.empty()==false) {
-            std::vector<float> bb = getTractogramBBox(&tractogram);
+            std::vector<float> bb = getTractogramBBox(tractogram);
             bb.push_back(-0.5);         // This is the 4th, i.e., the DEC dimension
             bb.push_back( 2.5);
 
@@ -269,7 +273,7 @@ void run_track2img()
         }
 
     
-        Tractogram2ImageMapper<float> gridder(&tractogram,&img);
+        Tractogram2ImageMapper<float> gridder(tractogram,&img);
 
         if (*mask_option) {
             NIBR::Image<int> mask(mask_image);
@@ -310,11 +314,11 @@ void run_track2img()
 
         // Use voxDim
         if (voxDim.empty()==false) {
-            std::vector<float> bb = getTractogramBBox(&tractogram);
+            std::vector<float> bb = getTractogramBBox(tractogram);
             img.createFromBoundingBox(3,bb,voxDim,false);
         }
         
-        Tractogram2ImageMapper<uint32_t> gridder(&tractogram,&img);
+        Tractogram2ImageMapper<uint32_t> gridder(tractogram,&img);
         
         if (*mask_option) {
             NIBR::Image<int> mask(mask_image);

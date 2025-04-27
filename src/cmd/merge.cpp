@@ -28,21 +28,21 @@ void run_merge()
 
 
     NIBR::disp(MSG_DEBUG,"Initializing tractogram 1");
-    NIBR::TractogramReader inp1;
-    if (!inp1.initReader(inp1_fname)) {
-        std::cout << "Can't read " << inp1_fname << std::endl << std::flush;
+    auto inp1 = std::make_shared<NIBR::TractogramReader>(inp1_fname);
+    if(!inp1->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file 1!");
         return;
     }
 
     NIBR::disp(MSG_DEBUG,"Initializing tractogram 2");
-    NIBR::TractogramReader inp2;
-    if (!inp2.initReader(inp2_fname)) {
-        std::cout << "Can't read " << inp2_fname << std::endl << std::flush;
+    auto inp2 = std::make_shared<NIBR::TractogramReader>(inp2_fname);
+    if(!inp2->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file 2!");
         return;
     }
 
     NIBR::disp(MSG_DEBUG,"Running merge");
-    auto merged = NIBR::tractogramMerge(&inp1,&inp2,checkDuplicates);
+    auto merged = NIBR::tractogramMerge(inp1,inp2,checkDuplicates);
 
     NIBR::disp(MSG_DEBUG,"Writing tractogram");
     NIBR::writeTractogram(out_fname, merged);

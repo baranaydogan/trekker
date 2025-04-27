@@ -44,17 +44,21 @@ void run_convert()
     }
 
 
-    NIBR::TractogramReader tractogram(inp_fname);
+    auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
+    if(!tractogram->isOpen()){
+        disp(MSG_ERROR,"Could not read input tractogram file!");
+        return;
+    }
 
     if (reference != "") {
         NIBR::Image<bool> img(reference);
-        tractogram.setReferenceImage(&img);
+        tractogram->setReferenceImage(&img);
     }
     
     if (ascii && (out_ext=="vtk"))
-        NIBR::writeTractogram_VTK_ascii(out_fname,&tractogram);
+        NIBR::writeTractogram_VTK_ascii(out_fname,tractogram);
     else
-        NIBR::writeTractogram(out_fname,&tractogram);
+        NIBR::writeTractogram(out_fname,tractogram);
        
 }          
     

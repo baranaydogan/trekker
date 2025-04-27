@@ -50,16 +50,17 @@ void run_info()
         (ext == "tck") || 
         (ext == "trk")) {
 
-        NIBR::TractogramReader tractogram;
         bool isTractogram = false;
+
+        auto tractogram = std::make_shared<NIBR::TractogramReader>(inp_fname);
         
-        if (tractogram.initReader(inp_fname)) {
+        if (tractogram->isOpen()) {
             
             if ((ext=="tck") || (ext == "trk")) {
                  isTractogram = true;
             } else {
-                if (((tractogram.numberOfPoints == 0) && (tractogram.numberOfStreamlines == 0)) ||
-                    ((tractogram.numberOfPoints  > 0) && (tractogram.numberOfStreamlines  > 0))) {
+                if (((tractogram->numberOfPoints == 0) && (tractogram->numberOfStreamlines == 0)) ||
+                    ((tractogram->numberOfPoints  > 0) && (tractogram->numberOfStreamlines  > 0))) {
                         isTractogram = true;
                 }
             }
@@ -69,7 +70,7 @@ void run_info()
 
         if (isTractogram) {
             disp(MSG_DETAIL, "Tractogram");
-            tractogram.printInfo();
+            tractogram->printInfo();
             return;
         }
 
