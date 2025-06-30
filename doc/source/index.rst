@@ -206,8 +206,6 @@ Release notes for Trekker-v1.0.0-rc5
     
     - **Improvement 1**: Switched to glib based Linux executable.
 
-Trekker offers state-of-the-art tractography tools to study the structural connectivity of the brain. Trekker aims to improve fiber tracking pipelines by offering features like:
-
 Release notes for Trekker-v1.0.0-rc4
 ------------------------------------
 
