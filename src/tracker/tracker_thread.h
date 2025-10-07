@@ -68,9 +68,9 @@ public:
 	Coordinate              seed_init_direction;
 
 	FOD_Image      		   *tracker_FOD;
-	ROI_Image      		   *tracker_SEED;
+	SCALAR_Image      		   *tracker_SEED;
 
-	std::vector<ROI_Image*> tracker_ROI;
+	std::vector<SCALAR_Image*> tracker_ROI;
 	std::vector<bool> 		tracker_ROI_ready_status;
 
 	Tracking_Side 			tracker_side;

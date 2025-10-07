@@ -1,0 +1,106 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Release-a89e6dff028155941d27.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Trekker",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "OBJS::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-OBJS-Release-165a0857f2c825f572fb.json",
+					"name" : "OBJS",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "Trekker::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Trekker-Release-d8095d0f19c87c271533.json",
+					"name" : "Trekker",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "combined::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-combined-Release-1b59834df8b91fb0fccd.json",
+					"name" : "combined",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "libTrekker.a::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-libTrekker.a-Release-315c5951295f5d0f782b.json",
+					"name" : "libTrekker.a",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "tmp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-tmp-Release-dbb1d18c3cb875ac7148.json",
+					"name" : "tmp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "trekker::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-trekker-Release-a8ab2c5ed53d595560d3.json",
+					"name" : "trekker",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/baran/Work/code/trekker/build",
+		"source" : "/home/baran/Work/code/trekker"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

@@ -1189,7 +1189,7 @@ void InputParser::parse_pathway_require_entry() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1219,7 +1219,7 @@ void InputParser::parse_pathwayA_require_entry() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1250,7 +1250,7 @@ void InputParser::parse_pathwayB_require_entry() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1281,7 +1281,7 @@ void InputParser::parse_pathway_require_exit() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1311,7 +1311,7 @@ void InputParser::parse_pathwayA_require_exit() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1342,7 +1342,7 @@ void InputParser::parse_pathwayB_require_exit() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1375,7 +1375,7 @@ void InputParser::parse_pathway_stop_at_entry() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1405,7 +1405,7 @@ void InputParser::parse_pathwayA_stop_at_entry() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1436,7 +1436,7 @@ void InputParser::parse_pathwayB_stop_at_entry() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1469,7 +1469,7 @@ void InputParser::parse_pathway_stop_at_exit() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1499,7 +1499,7 @@ void InputParser::parse_pathwayA_stop_at_exit() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1530,7 +1530,7 @@ void InputParser::parse_pathwayB_stop_at_exit() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1561,7 +1561,7 @@ void InputParser::parse_pathway_discard_if_enters() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1591,7 +1591,7 @@ void InputParser::parse_pathwayA_discard_if_enters() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1621,7 +1621,7 @@ void InputParser::parse_pathwayB_discard_if_enters() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1652,7 +1652,7 @@ void InputParser::parse_pathway_discard_if_exits() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1682,7 +1682,7 @@ void InputParser::parse_pathwayA_discard_if_exits() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1712,7 +1712,7 @@ void InputParser::parse_pathwayB_discard_if_exits() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1742,7 +1742,7 @@ void InputParser::parse_pathway_discard_if_ends_inside() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1772,7 +1772,7 @@ void InputParser::parse_pathwayA_discard_if_ends_inside() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);
@@ -1802,7 +1802,7 @@ void InputParser::parse_pathwayB_discard_if_ends_inside() {
 		exit(EXIT_FAILURE);
 	}
 
-	ROI_Image *tmp = new ROI_Image;
+	SCALAR_Image *tmp = new SCALAR_Image;
 	if(!tmp->readHeader(argv[argv_index])) {
 		std::cout << "Cannot read image: " << argv[argv_index] << std::endl;
 		exit(EXIT_FAILURE);

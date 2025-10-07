@@ -29,14 +29,37 @@ bool SCALAR_Image::readImage() {
     
     // Copy everything in a float array with dimension 1
     data    = new float*[sxyz];
-    MT::MTRUN(sxyz, sxyz/16, MT::maxNumberOfThreads,[&](MTTASK task)->void {
-        data[task.no]    = new float[1];
-        data[task.no][0] = accessor->get(nim->data,task.no);
+
+	MT::MTRUN(sxyz, sxyz/16, MT::maxNumberOfThreads,[&](MTTASK task)->void {
+
+        float val = accessor->get(nim->data,task.no);
+        
+		if (labelFlag) {
+			if (val==label) {
+				data[task.no]    = new float[1];
+				data[task.no][0] = 1;
+				MT::proc_mx.lock();
+				nnzVoxelInds.push_back(task.no);
+				MT::proc_mx.unlock();
+			} else 
+				data[task.no] = zero;
+		} 
+		else if (val>0) {
+			data[task.no]    = new float[1];
+			data[task.no][0] = val;
+			MT::proc_mx.lock();
+			nnzVoxelInds.push_back(task.no);
+			MT::proc_mx.unlock();
+		} else 
+			data[task.no] = zero;
+            
+        
     });
 
-    
 	nifti_image_unload(nim);
 	delete accessor;
+
+	status = notDone;
 
 	nim->nt = 1; //Force the forth dimension to be 1 so indexing will not crash if an 3D image with nim->nt=0 comes
 
@@ -44,4 +67,37 @@ bool SCALAR_Image::readImage() {
 
 	return true;
 
+}
+
+SCALAR_Image::SCALAR_Image(const SCALAR_Image& obj) : Image(obj) {
+	side 					= obj.side;
+	status 					= obj.status;
+	entry_status 			= obj.entry_status;
+	exit_status  			= obj.exit_status;
+	type 		 			= obj.type;
+	self 					= obj.self;
+	labelFlag 				= obj.labelFlag;
+	label 					= obj.label;
+}
+
+Coordinate SCALAR_Image::ind2phy(size_t index) {
+
+	int i,j,k;
+	ind2sub(index,i,j,k);
+
+	float x = ijk2xyz[0][0]*i + ijk2xyz[0][1]*j + ijk2xyz[0][2]*k + ijk2xyz[0][3];
+	float y = ijk2xyz[1][0]*i + ijk2xyz[1][1]*j + ijk2xyz[1][2]*k + ijk2xyz[1][3];
+	float z = ijk2xyz[2][0]*i + ijk2xyz[2][1]*j + ijk2xyz[2][2]*k + ijk2xyz[2][3];
+
+	return Coordinate(x,y,z);
+}
+
+void SCALAR_Image::ind2sub(size_t index, int& i, int& j, int& k) {
+	i = index % nim->nx;
+	j = (index - i)/nim->nx % nim->ny;
+	k = ((index - i)/nim->nx-j)/nim->ny;
+}
+
+size_t SCALAR_Image::sub2ind(int i, int j, int k) {
+	return i + nim->nx*(j+nim->ny*k);
 }

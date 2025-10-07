@@ -4,7 +4,7 @@ using namespace GENERAL;
 
 namespace SEED {
 
-ROI_Image* img_SEED 		= new ROI_Image;
+SCALAR_Image* img_SEED 		= new SCALAR_Image;
 std::vector<size_t>   		seed_indices;
 std::vector<Coordinate>     seed_coordinates;
 std::vector<Coordinate>     seed_init_directions;

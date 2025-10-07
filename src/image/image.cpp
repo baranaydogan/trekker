@@ -358,3 +358,16 @@ void Image::getVal(float *p, float* out) {
 	}
     
 }
+
+float Image::getVal(Coordinate phy) {
+
+	float out;
+	float p[3];
+	p[0] = phy.x;
+	p[1] = phy.y;
+	p[2] = phy.z;
+    
+	getVal(p,&out);
+            
+    return out;
+}

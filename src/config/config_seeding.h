@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-#include "../image/roi_image.h"
+#include "../image/scalar_image.h"
 #include "config_general.h"
 
 #define MAXNUMBEROFSEEDS				1e9
@@ -19,7 +19,7 @@ typedef enum {
 
 namespace SEED {
 
-extern ROI_Image                  *img_SEED;
+extern SCALAR_Image               *img_SEED;
 extern std::vector<size_t>   	   seed_indices;
 
 extern std::vector<Coordinate>     seed_coordinates;

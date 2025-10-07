@@ -1,4 +1,6 @@
 #include "trekker.h"
+#include "config/config_tracker.h"
+#include "math/doRandomThings.h"
 #include "tracker/tracker_thread.h"
 
 using namespace GENERAL;
@@ -155,7 +157,7 @@ void checkFOD(std::string pathToFODimage, bool discretizationFlag, bool spherica
 	strcpy(char_array, pathToFODimage.c_str());
 
     if (img_FOD  == NULL) { img_FOD  = new FOD_Image(); }
-    if (img_SEED == NULL) { img_SEED = new ROI_Image(); }
+    if (img_SEED == NULL) { img_SEED = new SCALAR_Image(); }
     
 	if(!img_FOD->readHeader(char_array)) {
         
@@ -323,14 +325,17 @@ void Trekker::execute() {
 	int  seedNo 		 = 0;
 
    	lineCountToFlush = 1;
+
     
 	if (GENERAL::verboseLevel!=QUITE) {
 		std::cout << "--------------------" << std::endl;
 		std::cout << "Tracking" << std::endl << std::endl;;
 		TRACKER::tractogram->printSummary();
 	}
-	
-	int         numberOfThreadsToUse = ( (GENERAL::numberOfThreads<=SEED::count) ? GENERAL::numberOfThreads : SEED::count);
+
+    // This has to be 1 so parameters can be randomized
+	int numberOfThreadsToUse = 1; // ( (GENERAL::numberOfThreads<=SEED::count) ? GENERAL::numberOfThreads : SEED::count);
+    GENERAL::numberOfThreads = 1;
 	
     std::thread             *threads = new std::thread[numberOfThreadsToUse];
 	TrackingThread          *tracker = new TrackingThread[numberOfThreadsToUse];
@@ -338,13 +343,60 @@ void Trekker::execute() {
 	int                 finalThreads = 0;
     
     std::unique_lock<std::mutex> lk(MT::exit_mx);
+
+
+    // Parameters
+    atMaxLength("stop");
+    minFODamp(0);
+    dataSupportExponent(1);
+    directionality("one_sided");
+    initMaxEstTrials(1);
+    propMaxEstTrials(1);
+    maxSamplingPerStep(1);
+    useBestAtInit(false);
+    ignoreWeakLinks(0);
+    probeCount(1);
+    probeQuality(1);
+    probeLength(1);
+    probeRadius(1);
+
+    // Randomize parameters
+    RandomDoer rad;
+    auto randParam = [&]()->void {
+
+        float minRadCurv=0;
+        while (minRadCurv<0.1) {
+            minRadCurv = 2.0f*rad.uniform_01();
+        }
+        float circ = 2.0f*PI*minRadCurv;
+
+        float step=0;
+        while ((step>(circ*0.05f)) || (step<0.001)) {
+            step = 2.0f*rad.uniform_01();
+        }
+
+        float len = 0;
+        while (len<1) {
+            len = 400*rad.uniform_01();
+        }
+
+        stepSize(step);
+        minLength(len-1);
+        maxLength(len);
+        minRadiusOfCurvature(minRadCurv);
+        
+    };
+
+
+
     
 	for(seedNo=0; seedNo<numberOfThreadsToUse; ++seedNo) {
 		int threadNo = seedNo;
         
         tracker[threadNo].setThreadID(threadNo);
 		tracker[threadNo].updateSeedNoAndTrialCount(seedNo,1);
-        
+
+        randParam();
         threads[threadNo] = std::thread(getStreamline, (tracker+threadNo));
         threads[threadNo].detach();
 	}
@@ -355,6 +407,8 @@ void Trekker::execute() {
     
         MT::exit_cv.wait(lk);
         int tread_id = GENERAL::ready_thread_id;
+
+
         
 		// timeUp case
 		if ((tracker[tread_id].streamline->status==STREAMLINE_DISCARDED) && (tracker[tread_id].streamline->discardingReason==REACHED_TIME_LIMIT)) {
@@ -370,6 +424,7 @@ void Trekker::execute() {
             tracker[tread_id].updateSeedNoAndTrialCount(seedNo,tracker[tread_id].streamline->tracking_tries);
         }
         
+        randParam();
         threads[tread_id] = std::thread(getStreamline, (tracker+tread_id));
 		threads[tread_id].detach();
         
@@ -391,6 +446,7 @@ void Trekker::execute() {
 		} else if (tracker[tread_id].streamline->tracking_tries>(unsigned int)SEED::maxTrialsPerSeed) {
 			finalThreads++;
 		} else {
+            randParam();
             tracker[tread_id].updateSeedNoAndTrialCount(tracker[tread_id].seedNo,tracker[tread_id].streamline->tracking_tries);
             threads[tread_id] = std::thread(getStreamline, (tracker+tread_id));
             threads[tread_id].detach();
@@ -539,11 +595,11 @@ void se(std::string s, int l, bool q) {
     char* f = new char[n+1];
     strcpy(f, s.c_str());
     
-    ROI_Image*  test = new ROI_Image;
+    SCALAR_Image*  test = new SCALAR_Image;
     if(!test->readHeader(f)) {
         std::cout << "TREKKER::Cannot read seed image: " << f << std::endl;
     } else {
-        img_SEED = new ROI_Image;
+        img_SEED = new SCALAR_Image;
         SEED::img_SEED->readHeader(f);
         SEED::seedingMode = SEED_IMAGE;
         if (q) SEED::img_SEED->setLabel(l);
@@ -564,7 +620,7 @@ void Trekker::seed_image(std::string s, int l)  { se(s,l,true);  }
 void Trekker::seed_coordinates(std::vector< std::vector<double> > seed_coordinates) {
 
     SEED::cleanConfigSeeding();
-    SEED::img_SEED               = new ROI_Image; // This is necessary for tracker_thread to work, this will be deleted at exit
+    SEED::img_SEED               = new SCALAR_Image; // This is necessary for tracker_thread to work, this will be deleted at exit
 	SEED::seedingMode 	         = SEED_COORDINATES;
 	SEED::count 		         = seed_coordinates.size();
     SEED::seed_coordinate_fname  = "";
@@ -587,7 +643,7 @@ void Trekker::seed_coordinates_with_directions(std::vector< std::vector<double> 
     }
     
     SEED::cleanConfigSeeding();
-    SEED::img_SEED                   = new ROI_Image; // This is necessary for tracker_thread to work, this will be deleted at exit
+    SEED::img_SEED                   = new SCALAR_Image; // This is necessary for tracker_thread to work, this will be deleted at exit
 	SEED::seedingMode 	             = SEED_COORDINATES_WITH_DIRECTIONS;
 	SEED::count 		             = seed_coordinates.size();
     SEED::seed_coordinate_fname      = "";
@@ -618,13 +674,13 @@ void Trekker::seed_maxTrials(int n) { SEED::maxTrialsPerSeed = n;}
 
 void Trekker::clearPathwayRules() {PATHWAY::cleanConfigROI();}
 
-ROI_Image* checkPathway(std::string s) {
+SCALAR_Image* checkPathway(std::string s) {
     
     int n   = s.length();
     char* f = new char[n+1];
     strcpy(f, s.c_str());
     
-    ROI_Image *tmp = new ROI_Image;
+    SCALAR_Image *tmp = new SCALAR_Image;
     if(!tmp->readHeader(f)) {
         std::cout << "TREKKER::Cannot read pathway image: " << f << std::endl;
         delete[] f;
@@ -634,7 +690,7 @@ ROI_Image* checkPathway(std::string s) {
     return tmp;
 }
 
-void addPathway(ROI_Image* tmp, int l, bool q, Tracking_Side side) {
+void addPathway(SCALAR_Image* tmp, int l, bool q, Tracking_Side side) {
     if (q) tmp->setLabel(l);
     tmp->side = side;
     tmp->readImage();
@@ -647,7 +703,7 @@ void addPathway(ROI_Image* tmp, int l, bool q, Tracking_Side side) {
 
 // require_entry
 void pren(std::string s, int l, bool q, Tracking_Side side) {
-    ROI_Image *tmp = checkPathway(s);
+    SCALAR_Image *tmp = checkPathway(s);
     if (tmp!=NULL) {
         tmp->type = roi_type_req_entry;
         addPathway(tmp,l,q,side);
@@ -665,7 +721,7 @@ void Trekker::pathway_B_require_entry(std::string s, int l) { pren(s, l, true,  
 
 // require_exit
 void prex(std::string s, int l, bool q, Tracking_Side side) {
-    ROI_Image *tmp = checkPathway(s);
+    SCALAR_Image *tmp = checkPathway(s);
     if (tmp!=NULL) {
         tmp->type = roi_type_req_exit;
         addPathway(tmp,l,q,side);
@@ -684,7 +740,7 @@ void Trekker::pathway_B_require_exit(std::string s, int l) { prex(s, l, true,  s
 
 // stop_at_entry
 void sten(std::string s, int l, bool q, Tracking_Side side) {
-    ROI_Image *tmp = checkPathway(s);
+    SCALAR_Image *tmp = checkPathway(s);
     if (tmp!=NULL) {
         tmp->type = roi_type_stop_at_entry;
         addPathway(tmp,l,q,side);
@@ -703,7 +759,7 @@ void Trekker::pathway_B_stop_at_entry(std::string s, int l) { sten(s, l, true,  
 
 // stop_at_exit
 void stex(std::string s, int l, bool q, Tracking_Side side) {
-    ROI_Image *tmp = checkPathway(s);
+    SCALAR_Image *tmp = checkPathway(s);
     if (tmp!=NULL) {
         tmp->type = roi_type_stop_at_exit;
         addPathway(tmp,l,q,side);
@@ -722,7 +778,7 @@ void Trekker::pathway_B_stop_at_exit(std::string s, int l) { stex(s, l, true,  s
 
 // discard_if_enters
 void dien(std::string s, int l, bool q, Tracking_Side side) {
-    ROI_Image *tmp = checkPathway(s);
+    SCALAR_Image *tmp = checkPathway(s);
     if (tmp!=NULL) {
         tmp->type = roi_type_discard_if_enters;
         addPathway(tmp,l,q,side);
@@ -741,7 +797,7 @@ void Trekker::pathway_B_discard_if_enters(std::string s, int l) { dien(s, l, tru
 
 // discard_if_exits
 void diex(std::string s, int l, bool q, Tracking_Side side) {
-    ROI_Image *tmp = checkPathway(s);
+    SCALAR_Image *tmp = checkPathway(s);
     if (tmp!=NULL) {
         tmp->type = roi_type_discard_if_exits;
         addPathway(tmp,l,q,side);
@@ -761,7 +817,7 @@ void Trekker::pathway_B_discard_if_exits(std::string s, int l) { diex(s, l, true
 
 // discard_if_ends_inside
 void diei(std::string s, int l, bool q, Tracking_Side side) {
-    ROI_Image *tmp = checkPathway(s);
+    SCALAR_Image *tmp = checkPathway(s);
     if (tmp!=NULL) {
         tmp->type = roi_type_discard_if_ends_inside;
         addPathway(tmp,l,q,side);

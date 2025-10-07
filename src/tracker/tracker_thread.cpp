@@ -34,7 +34,7 @@ TrackingThread::TrackingThread() {
 	tracker_randomThings 						= new RandomDoer();
 	tracker_FOD 								= new FOD_Image(*TRACKER::img_FOD);
     if (SEED::seedingMode==SEED_IMAGE) { 
-        tracker_SEED = new ROI_Image(*SEED::img_SEED);
+        tracker_SEED = new SCALAR_Image(*SEED::img_SEED);
     }
     
 	switch (TRACKER::algorithm) {
@@ -50,8 +50,8 @@ TrackingThread::TrackingThread() {
 	method->setThread(this);
 
     
-	for (std::vector<ROI_Image*>::iterator it = PATHWAY::img_ROI.begin(); it != PATHWAY::img_ROI.end(); ++it) {
-		tracker_ROI.push_back(new ROI_Image(**it));
+	for (std::vector<SCALAR_Image*>::iterator it = PATHWAY::img_ROI.begin(); it != PATHWAY::img_ROI.end(); ++it) {
+		tracker_ROI.push_back(new SCALAR_Image(**it));
 		tracker_ROI_ready_status.push_back(false);
 	}
 
@@ -94,7 +94,7 @@ TrackingThread::~TrackingThread() {
 	delete 	 tracker_randomThings;
 	delete   method;
 
-	for (std::vector<ROI_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {(*it)->destroyCopy(); delete *it;}
+	for (std::vector<SCALAR_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {(*it)->destroyCopy(); delete *it;}
 
 }
 
@@ -171,7 +171,7 @@ void TrackingThread::track(Coordinate *point) {
 		tracker_ROI_order 	= 0;
 
 		std::vector<bool>::iterator bit = tracker_ROI_ready_status.begin();
-		for (std::vector<ROI_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
+		for (std::vector<SCALAR_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
 
 			(*it)->entry_status 	= entry_status_undefined;
 			(*it)->exit_status 		= exit_status_undefined;
@@ -230,7 +230,7 @@ void TrackingThread::track(Coordinate *point) {
 				if (GENERAL::verboseLevel > ON) std::cout << "successful, with " << streamline->coordinates.size()-1 << " steps taken." << std::endl;
 				if (tracker_side==side_A) {
 					std::vector<bool>::iterator lbit = tracker_ROI_ready_status.begin();
-					for (std::vector<ROI_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
+					for (std::vector<SCALAR_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
 						if ( ((*it)->side==side_A) && (((*it)->type==roi_type_req_entry) || ((*it)->type==roi_type_req_exit)) && ((*lbit)==false) ) {
 							streamline->discardingReason 	= REQUIRED_ROI_NOT_MET;
 							streamline->status 				= STREAMLINE_DISCARDED;
@@ -240,7 +240,7 @@ void TrackingThread::track(Coordinate *point) {
 					}
 				} else if (tracker_side==side_B) {
 					std::vector<bool>::iterator lbit = tracker_ROI_ready_status.begin();
-					for (std::vector<ROI_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
+					for (std::vector<SCALAR_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
 						if ( ( (*it)->side==side_B) && (((*it)->type==roi_type_req_entry) || ((*it)->type==roi_type_req_exit)) && ((*lbit)==false) ) {
 							streamline->discardingReason 	= REQUIRED_ROI_NOT_MET;
 							streamline->status 				= STREAMLINE_DISCARDED;
@@ -249,7 +249,7 @@ void TrackingThread::track(Coordinate *point) {
 						lbit++;
 					}
 				} else {
-					for (std::vector<ROI_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
+					for (std::vector<SCALAR_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); ++it) {
 						(*it)->entry_status 	= entry_status_undefined;
 						(*it)->exit_status 		= exit_status_undefined;
 					}
@@ -300,7 +300,7 @@ void TrackingThread::track(Coordinate *point) {
 
 				// Final check of ROI rules
 				std::vector<bool>::iterator lbit = tracker_ROI_ready_status.begin();
-				for (std::vector<ROI_Image*>::iterator it = PATHWAY::img_ROI.begin(); it != PATHWAY::img_ROI.end(); ++it) {
+				for (std::vector<SCALAR_Image*>::iterator it = PATHWAY::img_ROI.begin(); it != PATHWAY::img_ROI.end(); ++it) {
 					if ( (((*it)->type==roi_type_req_entry) || ((*it)->type==roi_type_req_exit)) && ((*lbit)==false) ){
 						streamline->discardingReason 	= REQUIRED_ROI_NOT_MET;
 						streamline->status 				= STREAMLINE_DISCARDED;
@@ -519,7 +519,7 @@ StreamlineStatus TrackingThread::run(bool side) {
 		return STREAMLINE_DISCARDED;
 
 	// Discard if streamline ends inside a region where is not allowed
-	for (std::vector<ROI_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); it++) {
+	for (std::vector<SCALAR_Image*>::iterator it = tracker_ROI.begin(); it != tracker_ROI.end(); it++) {
 		if ((*it)->type == roi_type_discard_if_ends_inside) {
 			float val 		= (*it)->getVal(streamline->coordinates.back());
 			if (val>=0.5) {

@@ -451,7 +451,7 @@ FILE* Tractogram::writeBaseMetadataOutput() {
 
 	fprintf(out,",\n\"PATHWAY OPTIONS\": {");
 	int ruleCount = 1;
-	for (std::vector<ROI_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it) {
+	for (std::vector<SCALAR_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it) {
 		switch ((*it)->type) {
 		case roi_type_req_entry: 				tmp = "require_entry          "; break;
 		case roi_type_req_exit: 				tmp = "require_exit           "; break;

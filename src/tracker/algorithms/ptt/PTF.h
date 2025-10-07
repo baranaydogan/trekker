@@ -69,12 +69,16 @@ private:
 
 
 inline float PTF::getFODamp(float *pv, float *Tv) {
+
+    return 1;
     
+    /*
     if (TRACKER::fodDiscretization==FODDISC_OFF) {
         ptf_FOD->getVal(pv,FOD);
         return SH::SH_amplitude(FOD,Tv);
     } else
         return ptf_FOD->getFODval(pv,Tv);
+    */
     
 }
 

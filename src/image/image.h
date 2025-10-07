@@ -49,6 +49,7 @@ public:
 	unsigned char checkWorldBounds(float x, float y, float z);
 
 	void 		  getVal(float *p, float* out);
+	float 		  getVal(Coordinate phy);
 
 	nifti_image  *nim;
     size_t       *zs2i;

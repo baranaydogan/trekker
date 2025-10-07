@@ -4,15 +4,15 @@ using namespace GENERAL;
 
 namespace PATHWAY {
 
-std::vector<ROI_Image*> img_ROI;
-std::vector<ROI_Image*> order_of_ROIs;
-std::vector<ROI_Image*> order_of_side_A_ROIs;
-std::vector<ROI_Image*> order_of_side_B_ROIs;
+std::vector<SCALAR_Image*> img_ROI;
+std::vector<SCALAR_Image*> order_of_ROIs;
+std::vector<SCALAR_Image*> order_of_side_A_ROIs;
+std::vector<SCALAR_Image*> order_of_side_B_ROIs;
 Requirement_Order satisfy_requirements_in_order 	= REQUIREMENT_ORDER_NOTSET;
 
 void cleanConfigROI() {
 
-	for (std::vector<ROI_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it)
+	for (std::vector<SCALAR_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it)
 		delete *it;
     
     img_ROI.clear();
@@ -24,7 +24,7 @@ void cleanConfigROI() {
 
 void readROIImages() {
 
-	for (std::vector<ROI_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it) {
+	for (std::vector<SCALAR_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it) {
 		if (GENERAL::verboseLevel!=QUITE) std::cout << "Reading pathway image              : " << (*it)->getFilePath() << std::endl;
 		if(!(*it)->readImage()) exit(EXIT_FAILURE);
 	}
@@ -39,7 +39,7 @@ void print() {
 		std::cout << "Not specified" << std::endl;
 	} else {
 
-		for (std::vector<ROI_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it) {
+		for (std::vector<SCALAR_Image*>::iterator it = img_ROI.begin(); it != img_ROI.end(); ++it) {
 			switch ((*it)->type) {
 			case roi_type_req_entry: 				std::cout << "require_entry          "; break;
 			case roi_type_req_exit: 				std::cout << "require_exit           "; break;

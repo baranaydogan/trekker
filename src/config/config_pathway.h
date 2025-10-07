@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../image/roi_image.h"
+#include "../image/scalar_image.h"
 #include "config_general.h"
 #include "config_tracker.h"
 
@@ -16,10 +16,10 @@ typedef enum {
 
 namespace PATHWAY {
 
-extern std::vector<ROI_Image*> img_ROI;
-extern std::vector<ROI_Image*> order_of_ROIs;
-extern std::vector<ROI_Image*> order_of_side_A_ROIs;
-extern std::vector<ROI_Image*> order_of_side_B_ROIs;
+extern std::vector<SCALAR_Image*> img_ROI;
+extern std::vector<SCALAR_Image*> order_of_ROIs;
+extern std::vector<SCALAR_Image*> order_of_side_A_ROIs;
+extern std::vector<SCALAR_Image*> order_of_side_B_ROIs;
 
 extern Requirement_Order       satisfy_requirements_in_order;
 
