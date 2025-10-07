@@ -364,24 +364,42 @@ void Trekker::execute() {
     RandomDoer rad;
     auto randParam = [&]()->void {
 
-        float minRadCurv=0;
-        while (minRadCurv<0.1) {
-            minRadCurv = 2.0f*rad.uniform_01();
+        // Random streamlines with tighter constraints
+        float minRadCurv = 0;
+        while (minRadCurv < 0.4) {
+            minRadCurv = rad.uniform_01();
         }
-        float circ = 2.0f*PI*minRadCurv;
+        // float circ = 2.0f*PI*minRadCurv;
 
-        float step=0;
-        while ((step>(circ*0.05f)) || (step<0.001)) {
-            step = 2.0f*rad.uniform_01();
-        }
+        float step = minRadCurv / 12;
+        // while ((step>(circ*0.05f)) || (step<0.001)) {
+        //     step = 2.0f*rad.uniform_01();
+        // }
 
         float len = 0;
-        while (len<1) {
-            len = 400*rad.uniform_01();
+        while (len < 10) {
+            len = 250*rad.uniform_01();
         }
 
+        // Parameters used in original anomap paper
+        // float minRadCurv=0;
+        // while (minRadCurv<0.1) {
+        //     minRadCurv = 2.0f*rad.uniform_01();
+        // }
+        // float circ = 2.0f*PI*minRadCurv;
+
+        // float step=0;
+        // while ((step>(circ*0.05f)) || (step<0.001)) {
+        //     step = 2.0f*rad.uniform_01();
+        // }
+
+        // float len = 0;
+        // while (len<1) {
+        //     len = 400*rad.uniform_01();
+        // }
+
         stepSize(step);
-        minLength(len-1);
+        minLength(len-step);
         maxLength(len);
         minRadiusOfCurvature(minRadCurv);
         

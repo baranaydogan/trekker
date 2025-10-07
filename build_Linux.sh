@@ -3,8 +3,8 @@
 cmakeExe=cmake
 buildType=Release #Release or Debug
 
-c_compiler=gcc
-cxx_compiler=g++
+c_compiler=gcc-12
+cxx_compiler=g++-12
 
 buildPythonPackage=OFF #ON or OFF
 pythonExe=python
