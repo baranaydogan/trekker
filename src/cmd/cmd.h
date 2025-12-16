@@ -24,3 +24,6 @@ void track(CLI::App* app);
 void track2img(CLI::App* app);
 void track2surf(CLI::App* app);
 void transform(CLI::App* app);
+void modelTest(CLI::App* app);
+void decode(CLI::App* app);
+void encode(CLI::App* app);

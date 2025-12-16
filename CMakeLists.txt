@@ -14,6 +14,7 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install")
 option(BUILD_SHARED_LIBS    "Build shared libraries"                ON)
 option(USE_SYSTEM_NIBRARY   "Use system nibrary if exists"          OFF)
 option(BUILD_NATIVE         "Build with -march=native optimization" ON)
+option(ENABLE_AUTOENCODER       "Enable autoencoder features. Requires Torch" OFF)
 
 # Using C++17 standard
 set(CMAKE_CXX_STANDARD 17)
@@ -36,6 +37,18 @@ file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}
 
 list(REMOVE_ITEM SRCS "main.cpp")
 
+# remove dummy file from sources if using ae
+if(ENABLE_AUTOENCODER)
+    list(REMOVE_ITEM SRCS "src/cmd/ae_dummy.cpp")
+endif()
+
+# remove autoencoder files if not using ae
+if(NOT ENABLE_AUTOENCODER)
+    list(REMOVE_ITEM SRCS "src/cmd/ae_decode.cpp")
+    list(REMOVE_ITEM SRCS "src/cmd/ae_encode.cpp")
+    list(REMOVE_ITEM SRCS "src/cmd/ae_modelTest.cpp")
+endif()
+
 # Set executable
 add_executable(${CMDNAME} ${CMAKE_SOURCE_DIR}/src/main.cpp ${SRCS})
 
@@ -54,6 +67,10 @@ if(OpenMP_FOUND)
     target_include_directories(${CMDNAME} PUBLIC ${OpenMP_CXX_INCLUDE_DIRS})
 endif()
 
+if(ENABLE_AUTOENCODER)
+    find_package(Torch REQUIRED)
+    target_link_libraries(${CMDNAME} ${TORCH_LIBRARIES})
+endif()
 
 if ((CMAKE_CXX_COMPILER_ID MATCHES "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang") )
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")

@@ -41,7 +41,10 @@ int main(int argc, char *argv[]) {
     track(app.add_subcommand("track", ""));
     track2img(app.add_subcommand("track2img", ""));
     track2surf(app.add_subcommand("track2surf", ""));  
-    transform(app.add_subcommand("transform", ""));    
+    transform(app.add_subcommand("transform", ""));
+    modelTest(app.add_subcommand("modelTest", ""));
+    decode(app.add_subcommand("decode", ""));   
+    encode(app.add_subcommand("encode", ""));   
 
     std::vector<std::string> subcommands = {
         "addColor",
@@ -62,7 +65,10 @@ int main(int argc, char *argv[]) {
         "track",
         "track2img",
         "track2surf",
-        "transform"
+        "transform",
+        "modelTest",
+        "decode",
+        "encode"
     };
 
     const std::string dMRI_name          = "dMRI";
