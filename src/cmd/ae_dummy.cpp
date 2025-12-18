@@ -24,3 +24,9 @@ void decode(CLI::App* app)
     app->description("Autoencoder support is not compiled");
     app->callback(run_ae_dummy);
 } 
+
+void findClusterCenters(CLI::App* app) 
+{  
+    app->description("Autoencoder support is not compiled");
+    app->callback(run_ae_dummy);
+} 

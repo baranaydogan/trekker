@@ -47,6 +47,7 @@ if(NOT ENABLE_AUTOENCODER)
     list(REMOVE_ITEM SRCS "src/cmd/ae_decode.cpp")
     list(REMOVE_ITEM SRCS "src/cmd/ae_encode.cpp")
     list(REMOVE_ITEM SRCS "src/cmd/ae_modelTest.cpp")
+    list(REMOVE_ITEM SRCS "src/cmd/ae_findClusterCenters.cpp")
 endif()
 
 # Set executable

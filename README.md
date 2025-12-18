@@ -57,6 +57,7 @@ Trekker is natively supported on Linux, Windows, and macOS. Trekker can be insta
 
 *   **CMake**: min v3.15.0
 *   **OpenMP**
+*   **LibTorch**: if you want autoencoder support
 *   **C/C++ Compiler**: The following compilers have been tested and are known to work:
     *   **GCC** (min v9.0)
     *   **Clang**: v18.0.0 (v19 is known not to work)

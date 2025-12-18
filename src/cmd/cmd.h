@@ -27,3 +27,4 @@ void transform(CLI::App* app);
 void modelTest(CLI::App* app);
 void decode(CLI::App* app);
 void encode(CLI::App* app);
+void findClusterCenters(CLI::App* app);

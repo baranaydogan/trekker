@@ -1,6 +1,6 @@
 #include "cmd.h"
 #include "dMRI/tractography/autoencoder/StreamlineAutoencoder.h"
-#include "dMRI/tractography/autoencoder/encodeAndSave.h"
+#include "dMRI/tractography/autoencoder/autoEncoderUtils.h"
 
 using namespace NIBR;
 
@@ -44,7 +44,7 @@ void run_encode()
     }
 
     // Set model
-    NIBR::StreamlineAutoencoder model = NIBR::StreamlineAutoencoder(model_spec, useCPU, newGenSize);
+    StreamlineAutoencoder model = StreamlineAutoencoder(model_spec, useCPU, newGenSize);
     if (!model.isReady()) return;
 
     if (isFile) {

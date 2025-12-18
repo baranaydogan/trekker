@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
     modelTest(app.add_subcommand("modelTest", ""));
     decode(app.add_subcommand("decode", ""));   
     encode(app.add_subcommand("encode", ""));   
+    findClusterCenters(app.add_subcommand("findClusterCenters", ""));   
 
     std::vector<std::string> subcommands = {
         "addColor",
@@ -68,7 +69,8 @@ int main(int argc, char *argv[]) {
         "transform",
         "modelTest",
         "decode",
-        "encode"
+        "encode",
+        "findClusterCenters"
     };
 
     const std::string dMRI_name          = "dMRI";
