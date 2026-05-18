@@ -1,6 +1,6 @@
 # NIBRARY
 
-SET(NIBRARY_MIN_VERSION "0.5.0" CACHE STRING "Minimum nibrary version") 
+SET(NIBRARY_MIN_VERSION "0.5.1" CACHE STRING "Minimum nibrary version") 
 
 include("${CMAKE_CURRENT_LIST_DIR}/utils.cmake")
 
@@ -82,6 +82,7 @@ if (NOT USE_SYSTEM_NIBRARY)
             CMAKE_ARGS
                 -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                 -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS}
+                -DBUILD_NATIVE=${BUILD_NATIVE}
                 -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
                 -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                 -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}

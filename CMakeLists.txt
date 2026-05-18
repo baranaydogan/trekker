@@ -27,9 +27,6 @@ link_directories(${CMAKE_LIBRARY_PATH})
 
 add_subdirectory(external)
 include_directories(${NIBRARY_INCLUDE_DIR})
-include_directories(${NIBRARY_INCLUDE_DIR}/trx-cpp)
-include_directories(${NIBRARY_INCLUDE_DIR}/libzip)
-
 link_directories(${NIBRARY_LIBRARY_DIR})
 
 message(STATUS ">> NIBRARY_LIBRARY_DIR: ${NIBRARY_LIBRARY_DIR}")
@@ -70,20 +67,17 @@ endif()
 
 if (UNIX)
 
-    # Optimize for native architecture
-    if (BUILD_NATIVE)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-    endif()
-
-    # Debug messages
-    if(CMAKE_BUILD_TYPE MATCHES Debug)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+    # Architecture optimization
+    if(BUILD_NATIVE)
+        if(APPLE)
+            target_compile_options(${CMDNAME} PRIVATE -mcpu=native)  # Apple Silicon (ARM) Clang
+        else()
+            target_compile_options(${CMDNAME} PRIVATE -march=native) # Standard Linux x86/ARM
+        endif()
+    else()
+        target_compile_options(${CMDNAME} PRIVATE -mtune=generic)
     endif()
     
-endif()
-
-if (UNIX)
     # Thread support
     find_package(Threads)
     if(Threads_FOUND)
@@ -97,6 +91,7 @@ if (UNIX)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
     endif()
+
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
