@@ -102,6 +102,8 @@ void run_track2img()
             std::cout << "Spherical harmonics order should be a positive even integer."  << std::endl << std::flush;
             return;
         }
+        sfRes = (sfRes>0) ? sfRes : 17;
+        NIBR::SF::init(true,sfRes);
     }
 
 
@@ -351,7 +353,7 @@ void track2img(CLI::App* app)
 
     app->description("maps tractogram features on an image");
 
-    app->add_option("<input_tractogram>", inp_fname, "Input tractogram (.vtk, .tck, .trk)")
+    app->add_option("<input_tractogram>", inp_fname, "Input tractogram (.trx, .vtk, .tck, .trk)")
         ->required()
         ->check(CLI::ExistingFile);
 

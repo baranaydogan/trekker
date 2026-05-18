@@ -8,12 +8,14 @@ namespace CMDARGS_SELECT {
     std::string out_fname;
 
     CLI::Option* selectOpt  = NULL;
+    CLI::Option* labelOpt   = NULL;
     CLI::Option* randomOpt  = NULL;
     CLI::Option* orderedOpt = NULL;
 
-    std::string select_fname ="";
-    int select_random = 0;
-    std::vector<int> select_ordered = {0,0};
+    std::string select_fname             = "";
+    std::vector<std::string> label_list  = std::vector<std::string>();
+    int select_random                    = 0;
+    std::vector<int> select_ordered      = {0,0};
 
     int numberOfThreads     =  0;
     std::string verbose     = "info";
@@ -22,41 +24,21 @@ namespace CMDARGS_SELECT {
 
 using namespace CMDARGS_SELECT;
 
-
-// Write a subset of a TRX tractogram including DPS, DPV, and groups.
-// Uses in-memory approach since TRXWriter already buffers everything.
-static void writeTrxSubset(const std::string& out_fname,
-                           NIBR::TractogramReader& tractogram,
-                           const std::vector<size_t>& sorted_select)
-{
-    // Build subset tractogram in sorted-index order (matches existing writeTractogram behaviour)
-    NIBR::Tractogram subTractogram;
-    subTractogram.reserve(sorted_select.size());
-    for (size_t idx : sorted_select)
-        subTractogram.push_back(tractogram.getStreamline(idx));
-
-    auto subFields = NIBR::subsetTractogramFields(tractogram.getTrxFields(), sorted_select, tractogram);
-    auto subGroups = NIBR::subsetGroups(tractogram.getGroups(), sorted_select);
-
-    writeTractogram(out_fname, subTractogram, subFields, subGroups);
-
-    for (auto& f : subFields) clearField(f, subTractogram);
-}
-
 void run_select()
 {
 
     parseCommon(numberOfThreads,verbose);
     if (!parseForceOutput(out_fname,force)) return;
-    if (!ensureVTKorTCK(out_fname)) return;
+    if (!ensureNoTrk(out_fname)) return;
 
     int optCounter = 0;
     if (*selectOpt)  optCounter++;
+    if (*labelOpt)   optCounter++;
     if (*randomOpt)  optCounter++;
     if (*orderedOpt) optCounter++;
 
     if ( (optCounter==0) || (optCounter>1) ) {
-        std::cout << "Need one option. Use either \"random\", \"ordered\" or \"selection\"." << std::endl << std::flush;
+        NIBR::disp(MSG_ERROR, "Need exactly one selection option. Use either \"random\", \"ordered\", \"selection\" or \"label\".");
         return;
     }
 
@@ -71,10 +53,10 @@ void run_select()
     if(*selectOpt){
 
         FILE *selectFile;
-        selectFile = fopen(select_fname.c_str(), "rb+");
+        selectFile = fopen(select_fname.c_str(), "rb");
 
         if (selectFile == NULL) {
-            std::cout << "Can't read \"selection\" file: " << select_fname.c_str() << std::endl << std::flush;
+            NIBR::disp(MSG_ERROR, "Can't read \"selection\" file: %s.", select_fname.c_str());
             return;
         }
 
@@ -86,8 +68,53 @@ void run_select()
         }
         fclose(selectFile);
 
-        if (trxToTrx) writeTrxSubset(out_fname, tractogram, select);
-        else          writeTractogram(out_fname, &tractogram, select);
+        writeTractogram(out_fname, &tractogram, select);
+
+    } else if (*labelOpt) {
+
+        if (label_list.size() < 2) {
+            NIBR::disp(MSG_ERROR, "Need at least two inputs for \"label\" option. Use --label <file>,<label1>,<label2>,...");
+            return;
+        }
+
+        std::string label_fname = label_list[0];
+        std::vector<uint16_t> labels(label_list.size()-1);
+        for (size_t i=1; i<label_list.size(); i++) {
+            try {
+                int label = std::stoi(label_list[i]);
+                if (label < 0 || label > 65535) {
+                    NIBR::disp(MSG_ERROR, "Label value out of range (0-65535): %s.", label_list[i].c_str());
+                    return;
+                }
+                labels[i-1] = static_cast<uint16_t>(label);
+            } catch (const std::exception& e) {
+                NIBR::disp(MSG_ERROR, "Invalid label value: %s. Must be an integer.", label_list[i].c_str());
+                return;
+            }
+        }
+
+        // Read the binary label file
+        std::vector<uint16_t> streamline_labels(N);
+        FILE *labelFile = fopen(label_fname.c_str(), "rb");
+        if (labelFile == NULL) {
+            NIBR::disp(MSG_ERROR, "Can't read \"labels\" file: %s.", label_fname.c_str());
+            return;
+        }
+        size_t read_count = fread(streamline_labels.data(), sizeof(uint16_t), N, labelFile);
+        fclose(labelFile);
+        if (read_count != static_cast<size_t>(N)) {
+            NIBR::disp(MSG_ERROR, "Label file size does not match number of streamlines. Expected %d labels, got %d.", N, read_count);
+            return;
+        }
+
+        // Select streamlines with matching labels
+        for (int n = 0; n < N; n++) {
+            if (std::find(labels.begin(), labels.end(), streamline_labels[n]) != labels.end()) {
+                select.push_back(n);
+            }
+        }
+
+        writeTractogram(out_fname, &tractogram, select);
 
     } else if(*randomOpt){
 
@@ -105,8 +132,7 @@ void run_select()
         select.insert(select.begin(),allInd.begin(),allInd.begin()+select_random);
         std::sort(select.begin(), select.end()); // match sorted order of writeTractogram
 
-        if (trxToTrx) writeTrxSubset(out_fname, tractogram, select);
-        else          NIBR::writeTractogram(out_fname, &tractogram, select);
+        NIBR::writeTractogram(out_fname, &tractogram, select);
 
     } else {
 
@@ -133,8 +159,7 @@ void run_select()
         for (int i = select_ordered[0]; i < (select_ordered[1]+1); i++)
             select.push_back(i-1);
 
-        if (trxToTrx) writeTrxSubset(out_fname, tractogram, select);
-        else          NIBR::writeTractogram(out_fname, &tractogram, select);
+        NIBR::writeTractogram(out_fname, &tractogram, select);
 
     }
 
@@ -154,14 +179,15 @@ void select(CLI::App* app)
 
     app->description("selects streamlines from a tractogram");
 
-    app->add_option("<input_tractogram>",           inp_fname,          "Input tractogram (.vtk, .tck, .trk)")
+    app->add_option("<input_tractogram>",           inp_fname,          "Input tractogram (.trx, .vtk, .tck, .trk)")
         ->required()
         ->check(CLI::ExistingFile);
 
-    app->add_option("<output_tractogram>",          out_fname,          "Output tractogram (.vtk, .tck, .trx)")
+    app->add_option("<output_tractogram>",          out_fname,          "Output tractogram (.trx, .vtk, .tck)")
         ->required();    
     
     selectOpt = app->add_option("--selection, -s",  select_fname,       "File with binary values that mark selected streamlines with 1 and others with 0");    
+    labelOpt  = app->add_option("--label, -l",      label_list,         "Select streamlines given a binary (uint16) file and a list of labels, e.g. labels.uint16,10,223,3232")->delimiter(',');
     randomOpt = app->add_option("--random, -r",     select_random,      "Random tractogram file creating. One input required, total count for random lines")->expected(1);
     orderedOpt= app->add_option("--ordered, -o",    select_ordered,     "Ordered tractogram file creating. Two input required, begin and end index")->expected(2)->delimiter(' ');
 
